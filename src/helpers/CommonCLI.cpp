@@ -1026,6 +1026,22 @@ void CommonCLI::handleGetCmd(uint32_t sender_timestamp, char* command, char* rep
     sprintf(reply, "> %d", (uint32_t)_prefs->bridge_channel);
   } else if (memcmp(config, "bridge.secret", 13) == 0) {
     sprintf(reply, "> %s", _prefs->bridge_secret);
+  } else if (memcmp(config, "bridge.wifi.txpwr", 17) == 0) {
+    sprintf(reply, "> %d", (uint8_t)_prefs->bridge_wifi_txpwr);	
+  } else if (memcmp(config, "bridge.ltslp.enabled", 21) == 0) {
+    sprintf(reply, "> %s", _prefs->bridge_ltslp_enabled ? "on" : "off");
+  } else if (memcmp(config, "bridge.ltslp.slptime", 21) == 0) {
+    sprintf(reply, "> %d", (uint16_t)_prefs->bridge_ltslp_slptime);	  
+  } else if (memcmp(config, "bridge.ltslp.awake", 19) == 0) {
+    sprintf(reply, "> %d", (uint16_t)_prefs->bridge_ltslp_awake);
+  } else if (memcmp(config, "bridge.dpslp.enabled", 21) == 0) {
+    sprintf(reply, "> %s", _prefs->bridge_dpslp_enabled ? "on" : "off"); 
+  } else if (memcmp(config, "bridge.dpslp.starthr", 21) == 0) {
+    sprintf(reply, "> %d", (uint8_t)_prefs->bridge_dpslp_starthr);
+  } else if (memcmp(config, "bridge.dpslp.startmin", 22) == 0) {
+    sprintf(reply, "> %d", (uint8_t)_prefs->bridge_dpslp_startmin);
+  } else if (memcmp(config, "bridge.dpslp.duration", 22) == 0) {
+    sprintf(reply, "> %d", (uint32_t)_prefs->bridge_dpslp_duration);	  
 #endif
   } else if (memcmp(config, "bootloader.ver", 14) == 0) {
   #ifdef NRF52_PLATFORM
