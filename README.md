@@ -1,3 +1,32 @@
+## About MeshCore Repeater w/ESPNow Bridge-Power Save
+
+Power Save is specifically designed for solar powered repeaters using ESPNow Bridging and the Heltec V4 node.
+By default, the base firmware power save mode is diabled for the ESP32 with ESPNow Bridging.
+This firmware creates a Light Sleep and Deep Sleep to address the power hungry (120ma idle/rx) EPS32S3 repeaters using ESPNow.
+
+Light Sleep (no reboot upon awaking and 1-3 ms recovery) can now be enabled or disabled from CLI in this firmware.
+This light sleep is a continuous cycle of awake and sleep time based on CLI settings defined by the administrator. 
+The default is 2 secs awake and 1 sec sleep. The idle/rx current draw is reduced from 120ma to 30ma in a light sleep.
+The firmware will not go into light sleep and pauses until any pending ESPNow and LoRa traffic has been processed.
+Testing the default light sleep cycle shows that there is little/no impact to direct messaging due to multiple retries.  
+Adverts and flood messages may be missed during sleep if they traverse the ESPNow bridge. Lora wakes up by default.
+
+Deep Sleep (reboots upon awake and has a 3-10 sec recovery) can now be enabled or disabled from CLI in this firmware.
+Deep sleep is designed to be an off-hours sleep when little to no traffic is expected. All messages and adverts will be missed.
+This sleep mode is suited for network repeaters where, as an example, no traffic is expected late at night or private sensor
+network repeaters that only need to be awake for a specific period of time once a day for the transmission of readings.   
+The UTC hour start time and the sleep duration are based on CLI settings defined by the administrator.
+The default is sleep start at 8:00 UTC and a sleep duration of 7200 secs (2 hrs). The deep sleep current draw is less than 10ma.
+The firmware will not go into deep sleep and pauses until any pending ESPNow and LoRa traffic has been processed.
+Due to the complete shutdown of most all services, internal time can be lost and an external RTC w/backup battery may be required.
+An RV-3028 module, as the external RTC, was used in code development as it was already supported in the base firmware.
+RV-3028 to Heltec V4 Conn: SDA to GPIO17, SCL pin to GPIO18, Gnd to Gnd and 2-5VDC to 3.3V. A shared I2C bus with OLED, if present.
+
+This firmware version includes the ability to temporarily disable the sleep modes by pressing and holding the User Button
+so that USB, etc. can be used. Just reboot to restore the sleep activities. There is also the ability to adjust the ESPNow tx power 
+from CLI to assist with power saving. Set the tx power to the minimum required for the ESPNow bridge link path(s). There is also code
+implemented to apply the Long Range protocol (narrower bandwidth and smaller packets used) to ESPNow to increase range and reliability.
+
 ## About MeshCore
 
 MeshCore is a lightweight, portable C++ library that enables multi-hop packet routing for embedded projects using LoRa and other packet radios. It is designed for developers who want to create resilient, decentralized communication networks that work without the internet.
