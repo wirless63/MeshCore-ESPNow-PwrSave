@@ -769,7 +769,7 @@ void CommonCLI::handleSetCmd(uint32_t sender_timestamp, char* command, char* rep
       _prefs->bridge_channel = (uint8_t)ch;
       _callbacks->restartBridge();
       savePrefs();
-      strcpy(reply, "OK");
+      strcpy(reply, "OK - Bridge channel has been set. Reboot to apply setting");
     } else {
       strcpy(reply, "Error: channel must be between 1-14");
     }
@@ -778,6 +778,85 @@ void CommonCLI::handleSetCmd(uint32_t sender_timestamp, char* command, char* rep
     _callbacks->restartBridge();
     savePrefs();
     strcpy(reply, "OK");
+  } else if (memcmp(config, "bridge.wifi.txpwr ", 18) == 0) {
+      int txpwr = atoi(&config[18]);
+      if (txpwr > 7 && txpwr < 81) {
+        _prefs->bridge_wifi_txpwr = (uint8_t)txpwr;
+        savePrefs();
+        strcpy(reply, "OK - WiFi Max Tx power is set. Reboot to apply setting");
+      } else {
+        strcpy(reply, "Error: tx power must be between 8-80 which equates to 2-20dbm");
+	  }
+  } else if (memcmp(config, "bridge.ltslp.enabled ", 21) == 0) {
+      if(memcmp(&config[21], "off", 3) == 0) {
+	    _prefs->bridge_ltslp_enabled = 0;
+	    savePrefs();
+	    strcpy(reply, "OK - Light Sleep set to disabled. Reboot to apply setting");
+	    }else if(memcmp(&config[21], "on", 2) == 0) {
+	    _prefs->bridge_ltslp_enabled = 1;	
+        savePrefs();
+        strcpy(reply, "OK - Light Sleep set to enabled. Reboot to apply setting once timing is set");
+	    } else {
+      strcpy(reply, "Error: state must be on or off");
+	    }
+  } else if (memcmp(config, "bridge.ltslp.slptime ", 21) == 0) {
+    int slptime = atoi(&config[21]);
+        if (slptime > 0 && slptime < 64801) {
+        _prefs->bridge_ltslp_slptime = (uint16_t)slptime;
+        savePrefs();
+        strcpy(reply, "OK - Light Sleeping time is set. Enable Light Sleep Mode and Reboot");
+	    }else {
+        strcpy(reply, "Error: Sleeping time must be between 1-64800 seconds");	
+		}
+  } else if (memcmp(config, "bridge.ltslp.awake ", 19) == 0) {
+    int awake = atoi(&config[19]);
+        if (awake > 0 && awake < 64801) {
+        _prefs->bridge_ltslp_awake = (uint16_t)awake;
+        savePrefs();
+        strcpy(reply, "OK - Light Sleep awake time is set. Enable Light Sleep Mode and Reboot");
+	    }else {
+        strcpy(reply, "Error: Awake time must be between 1-64800 milliseconds");	
+		  }
+
+  } else if (memcmp(config, "bridge.dpslp.enabled ", 21) == 0) {
+      if(memcmp(&config[21], "off", 3) == 0) {
+	      _prefs->bridge_dpslp_enabled = 0;
+	      savePrefs();
+	      strcpy(reply, "OK - Deep Sleep disabled. Reboot to apply setting");
+	    } else if (memcmp(&config[21], "on", 2) == 0) {
+	      _prefs->bridge_dpslp_enabled = 1;	
+        savePrefs();
+        strcpy(reply, "OK - Deep Sleep enabled. Reboot to apply setting once timing is set");
+	    } else {
+        strcpy(reply, "Error: state must be on or off");
+	    }
+  } else if (memcmp(config, "bridge.dpslp.starthr ", 21) == 0) {
+    int starthr = atoi(&config[21]);
+        if (starthr != NULL && starthr > -1 && starthr < 24) {
+        _prefs->bridge_dpslp_starthr = (uint8_t)starthr;
+        savePrefs();
+        strcpy(reply, "OK - Deep Sleep UTC start hour is set. Enable Deep Sleep Mode and Reboot");
+	    }else {
+        strcpy(reply, "Error: Deep Sleep UTC start hour must be between 0-23");	
+		}	
+  } else if (memcmp(config, "bridge.dpslp.startmin ", 22) == 0) {
+    int startmin = atoi(&config[22]);
+        if (startmin != NULL && startmin > -1 && startmin < 60) {
+        _prefs->bridge_dpslp_startmin = (uint8_t)startmin;
+        savePrefs();
+        strcpy(reply, "OK - Deep Sleep start minutes is set. Enable Deep Sleep Mode and Reboot");
+	    }else {
+        strcpy(reply, "Error: Deep Sleep start minute must be between 0-59");	
+		}	    
+  } else if (memcmp(config, "bridge.dpslp.duration ", 22) == 0) {
+    int duration = atoi(&config[22]);
+      if (duration > 9 && duration < 86391) {
+        _prefs->bridge_dpslp_duration = (uint32_t)duration;
+        savePrefs();
+        strcpy(reply, "OK - Deep Sleep duration is set. Enable Deep Sleep Mode and Reboot");
+	    }else {
+        strcpy(reply, "Error: Deep Sleep duration must be between 10-86390 seconds");	
+		}  
 #endif
   } else if (memcmp(config, "adc.multiplier ", 15) == 0) {
     _prefs->adc_multiplier = atof(&config[15]);
