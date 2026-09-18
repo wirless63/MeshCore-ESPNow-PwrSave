@@ -1,7 +1,7 @@
 #include "ESPNowBridge.h"
-
 #include <WiFi.h>
 #include <esp_wifi.h>
+#include <helpers/ESP32Board.h> // Add for ESPNow sleep busy handling
 
 #ifdef WITH_ESPNOW_BRIDGE
 
@@ -37,13 +37,22 @@ void ESPNowBridge::begin() {
     BRIDGE_DEBUG_PRINTLN("Error setting WIFI channel to %d\n", _prefs->bridge_channel);
     return;
   }
-
+  
+  // Set ESPNow wifi maximum TX power
+  if (esp_wifi_set_max_tx_power(_prefs->bridge_wifi_txpwr) != ESP_OK) {
+    BRIDGE_DEBUG_PRINTLN("Error setting WIFI TX power to %d\n", _prefs->bridge_wifi_txpwr);
+    return;
+  }
+  
   // Initialize ESP-NOW
   if (esp_now_init() != ESP_OK) {
     BRIDGE_DEBUG_PRINTLN("Error initializing ESP-NOW\n");
     return;
   }
-
+  
+  // Set Long Range mode for ESPNow Bridges
+  esp_wifi_set_protocol(WIFI_IF_STA, WIFI_PROTOCOL_LR);
+  
   // Register callbacks
   esp_now_register_recv_cb(recv_cb);
   esp_now_register_send_cb(send_cb);
@@ -112,7 +121,9 @@ void ESPNowBridge::onDataRecv(const uint8_t *mac, const uint8_t *data, int32_t l
     BRIDGE_DEBUG_PRINTLN("RX packet too large, len=%d\n", len);
     return;
   }
-
+  if (len <= MAX_ESPNOW_PACKET_SIZE) {
+    espnow_recving = 1;                               //ESPNow recv busy 
+  }
   // Check packet header magic
   uint16_t received_magic = (data[0] << 8) | data[1];
   if (received_magic != BRIDGE_PACKET_MAGIC) {
@@ -143,7 +154,6 @@ void ESPNowBridge::onDataRecv(const uint8_t *mac, const uint8_t *data, int32_t l
   // Create mesh packet
   mesh::Packet *pkt = _instance->_mgr->allocNew();
   if (!pkt) return;
-
   if (pkt->readFrom(decrypted + BRIDGE_CHECKSUM_SIZE, payloadLen)) {
     _instance->onPacketReceived(pkt);
   } else {
@@ -168,6 +178,7 @@ void ESPNowBridge::sendPacket(mesh::Packet *packet) {
   }
 
   if (!_seen_packets.wasSeen(packet)) {
+    espnow_sending = 1;                                 //ESPNow sending busy
     _seen_packets.markSeen(packet);
     // Create a temporary buffer just for size calculation and reuse for actual writing
     uint8_t sizingBuffer[MAX_PAYLOAD_SIZE];
@@ -212,7 +223,6 @@ void ESPNowBridge::sendPacket(mesh::Packet *packet) {
     }
   }
 }
-
 void ESPNowBridge::onPacketReceived(mesh::Packet *packet) {
   handleReceivedPacket(packet);
 }
