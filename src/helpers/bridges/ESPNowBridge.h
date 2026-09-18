@@ -153,5 +153,7 @@ public:
    */
   void sendPacket(mesh::Packet *packet) override;
 };
+inline int espnow_recving;                  // added global variable for espnow busy status
+inline int espnow_sending;                  // added global variable for espnow busy status
 
 #endif
