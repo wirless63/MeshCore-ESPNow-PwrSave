@@ -54,6 +54,14 @@ public:
   uint32_t bridge_baud = 0;   // 9600, 19200, 38400, 57600, 115200 (default 115200)
   uint8_t bridge_channel = 0; // 1-14 (ESP-NOW only)
   char bridge_secret[16]; // for XOR encryption of bridge packets (ESP-NOW only)
+  uint8_t bridge_wifi_txpwr = 80;   // 8-80 which equates to 2-20 dbm (ESP-NOW only)
+  uint8_t bridge_ltslp_enabled = 0; // 1=on, 0=off, boolean (ESP-NOW only)
+  uint16_t bridge_ltslp_slptime = 1; // seconds (ESP-NOW only)
+  uint16_t bridge_ltslp_awake = 2000;   // milliseconds (ESP-NOW only)
+  uint8_t bridge_dpslp_enabled = 0;  // 1=on, 0=off, boolean (ESP-NOW only)
+  uint8_t bridge_dpslp_starthr = 8; //UTC hour 0-23  (ESP-NOW only)
+  uint8_t bridge_dpslp_startmin = 0; //0-59  (ESP-NOW only)  
+  uint32_t bridge_dpslp_duration = 10; //seconds (ESP-NOW only)
   // Power setting
   uint8_t powersaving_enabled = 0; // boolean
   // Gps settings
@@ -109,6 +117,14 @@ private:
       def("baud", _parent->bridge_baud);   // 9600, 19200, 38400, 57600, 115200 (default 115200)
       def("ch", _parent->bridge_channel); // 1-14 (ESP-NOW only)
       def("secret", _parent->bridge_secret, sizeof(_parent->bridge_secret)); // for XOR encryption of bridge packets (ESP-NOW only)
+	    def("txpwr", _parent->bridge_wifi_txpwr);  // 8-80 which equates to 2-20 dbm (ESP-NOW only)
+	    def("ltslp_enabled", _parent->bridge_ltslp_enabled); // boolean (ESP-NOW only)
+	    def("ltslp_slptime", _parent->bridge_ltslp_slptime); //seconds (ESP-NOW only)
+	    def("ltslp_awake", _parent->bridge_ltslp_awake); //milliseconds (ESP-NOW only)
+	    def("dpslp_enabled", _parent->bridge_dpslp_enabled); // boolean (ESP-NOW only)
+	    def("dpslp_starthr", _parent->bridge_dpslp_starthr);  //UTC hour 0-23  (ESP-NOW only)
+      def("dpslp_startmin", _parent->bridge_dpslp_startmin); //minute 0-59  (ESP-NOW only)
+	    def("dpslp_duration", _parent->bridge_dpslp_duration); //seconds (ESP-NOW only)      
     }
   public:
     BridgePrefs(NodePrefs* parent) : _parent(parent) { }
