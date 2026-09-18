@@ -1204,7 +1204,7 @@ Deep Sleep can be temporarily disabled (USB, Web Flashing, etc.), only while not
 
 ---
 
-#### Set the ESP-Now Off-Hours Deep Sleep Start Hour (ESPNow only)
+#### View or change the ESP-Now Off-Hours Deep Sleep Start Hour (ESPNow only)
 **Usage:** 
 - `get bridge.dpslp.starthr`
 - `set bridge.dpslp.starthr <starthr>`
@@ -1216,7 +1216,7 @@ Deep Sleep can be temporarily disabled (USB, Web Flashing, etc.), only while not
 
 ---
 
-#### Set the ESP-Now Off-Hours Deep Sleep Start Minute (ESPNow only)
+#### View or change the ESP-Now Off-Hours Deep Sleep Start Minute (ESPNow only)
 **Usage:** 
 - `get bridge.dpslp.startmin`
 - `set bridge.dpslp.startmin <starthr>`
@@ -1228,7 +1228,7 @@ Deep Sleep can be temporarily disabled (USB, Web Flashing, etc.), only while not
 
 ---
 
-#### Set the ESP-Now Off-Hours Deep Sleep Duration (ESPNow only)
+#### View or change the ESP-Now Off-Hours Deep Sleep Duration (ESPNow only)
 **Usage:** 
 - `get bridge.dpslp.duration`
 - `set bridge.dpslp.duration <duration>`
