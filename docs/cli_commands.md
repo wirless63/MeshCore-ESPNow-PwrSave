@@ -1127,7 +1127,19 @@ region save
 
 ---
 
-#### Set the ESP-Now secret
+#### View or change the wifi maximum tx power for bridging (ESPNow only)
+**Usage:**
+- `get bridge.wifi.txpwr`
+- `set bridge.wifi.txpwr <txpwr>`
+
+**Parameters:**
+- `txpwr`: 8-80, divide value by 4 which equates to 2 -20 dBm
+
+**Default:** `80`
+
+---
+
+#### Set the ESP-Now secret (ESPNow only)
 **Usage:** 
 - `get bridge.secret`
 - `set bridge.secret <secret>`
@@ -1136,6 +1148,95 @@ region save
 - `secret`: ESP-NOW bridge secret, up to 15 characters
 
 **Default:** Varies by board
+
+---
+
+#### View or enable ESP-Now Light Sleep Cycle (ESPNow only)
+**Usage:** 
+- `get bridge.ltslp.enabled`
+- `set bridge.ltslp.enabled <enabled>`
+
+**Parameters:**
+- `enabled`: on|off
+
+**Default:** `off`
+
+**Notes:** Light Sleep has a recovery time of 1-3 ms, starts on the line of code after the sleep command and the board does NOT reboot upon waking. Light Sleep can be temporarily disabled (USB, Web Flashing, etc.) by pressing and holding the User Button until the white LED flashes a few times. Reboot to reenable the configured Light Sleep cycle. Going into Light Sleep will be paused by the firmware until any pending ESPNow or LoRa traffic is processed.
+
+---
+
+#### View or change the ESP-Now Light Sleep Sleeping Time (ESPNow only)
+**Usage:** 
+- `get bridge.ltslp.slptime`
+- `set bridge.ltslp.slptime <ltslp>`
+
+**Parameters:**
+- `ltslp`: Light Sleep time sleeping in seconds (0-64800)
+
+**Default:** `1`
+
+---
+
+#### View or change the ESP-Now Light Sleep Awake Time (ESPNow only)
+**Usage:**
+- `get bridge.ltslp.awake`
+- `set bridge.ltslp.awake <awake>`
+
+**Parameters:**
+- `awake`: Light Sleep time awake in milliseconds (0-64800)
+
+**Default:** `2000`
+
+---
+
+#### View or enable ESP-Now Deep Sleep (ESPNow Only)
+**Usage:**
+-`get bridge.dpslp.enabled` 
+-`set bridge.dpslp.enabled <enabled>`
+
+**Parameters:**
+- `enabled`: on|off
+ 
+**Default:** `off`
+
+**Notes:** Using Deep Sleep will reset the internal ESP32 RTC clock so, an external battery powered RTC (ex. RV-3028) is required to maintain the clock during the Deep Sleep. A clock sync must be performed to set the external RTC and time should be resynced periodically. Deep Sleep has a recovery time of up to 10 secs, variables may be lost, and the board will do a FULL REBOOT upon waking. 
+Deep Sleep can be temporarily disabled (USB, Web Flashing, etc.), only while not in deep sleep, by pressing and holding the User Button until the white LED flashes a few times. Reboot to reenable the configured Deep Sleep mode. Going into Deep Sleep will be paused by the firmware until any pending ESPNow or LoRa traffic is processed.
+
+---
+
+#### Set the ESP-Now Off-Hours Deep Sleep Start Hour (ESPNow only)
+**Usage:** 
+- `get bridge.dpslp.starthr`
+- `set bridge.dpslp.starthr <starthr>`
+
+**Parameters:**
+- `starthr`: The UTC hour to start the off-hours deep sleep (0-23)
+
+**Default:** `8`
+
+---
+
+#### Set the ESP-Now Off-Hours Deep Sleep Start Minute (ESPNow only)
+**Usage:** 
+- `get bridge.dpslp.startmin`
+- `set bridge.dpslp.startmin <starthr>`
+
+**Parameters:** 
+- `startmin`: The start minute of start hour for deep sleep (0-59)
+
+**Default:** `0`
+
+---
+
+#### Set the ESP-Now Off-Hours Deep Sleep Duration (ESPNow only)
+**Usage:** 
+- `get bridge.dpslp.duration`
+- `set bridge.dpslp.duration <duration>`
+
+**Parameters:**
+- `duration`: Off-hours deep sleep duration in seconds (10-86390)
+
+**Default:** `10`
 
 ---
 
