@@ -106,6 +106,16 @@ void UITask::renderCurrScreen() {
     _display->setCursor(0, 30);
     sprintf(tmp, "BW: %03.2f CR: %d", _node_prefs->bw, _node_prefs->cr);
     _display->print(tmp);
+      
+    _display->setCursor(0, 40);
+    sprintf(tmp, "LORA TX PWR (dBm):%02d", _node_prefs->tx_power_dbm);
+    _display->print(tmp);
+      
+  #ifdef WITH_ESPNOW_BRIDGE  
+    _display->setCursor(0, 50);
+    sprintf(tmp, "ESPNOW BRG ON?:%d CH:%02d", _node_prefs->bridge_enabled, _node_prefs->bridge_channel);
+    _display->print(tmp); 
+  #endif    
   }
 }
 
@@ -119,10 +129,12 @@ void UITask::loop() {
       _display->turnOn();
     }
     _auto_off = millis() + AUTO_OFF_MILLIS;   // extend auto-off timer
+  #ifdef !WITH_ESPNOW_BRIDGE
   } else if (ev == BUTTON_EVENT_LONG_PRESS) {
       _display->turnOn();
       Serial.println("Powering Off");
       _powering_off_at = millis() + POWEROFF_DELAY; 
+  #endif
   }
 #endif
 
