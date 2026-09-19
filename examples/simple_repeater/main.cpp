@@ -30,7 +30,21 @@ static char ethernet_command[160];
 // For power saving
 unsigned long POWERSAVING_FIRSTSLEEP_SECS = 120; // The first sleep (if enabled) from boot
 
-#if defined(PIN_USER_BTN) && defined(_SEEED_SENSECAP_SOLAR_H_)
+// Define Sleep variables and needed files
+  unsigned long previousMillis = 0;   
+  unsigned int sleepDisabled = 0;    
+  uint8_t ltslp_en;
+  uint8_t dpslp_en;  
+  uint16_t sleeptime;
+  uint16_t awakeTime;
+  uint8_t startHr;
+  uint8_t startMin;  
+  uint16_t duration;
+  #include <helpers/CommonCLI.h>  
+  #include "Melopero_RV3028.h"
+  Melopero_RV3028 rtc;
+
+#if defined(PIN_USER_BTN) // && defined(_SEEED_SENSECAP_SOLAR_H_)
 static unsigned long userBtnDownAt = 0;
 #define USER_BTN_HOLD_OFF_MILLIS 1500
 #endif
@@ -106,6 +120,21 @@ void setup() {
 
   the_mesh.begin(fs);
 
+  // Initialize RTC timing for deep sleep mode 6 Sep 2026
+  Wire.begin();
+  rtc.initI2C();
+  rtc.set24HourMode();
+
+// Get prefs from memory to enable/disable sleep modes and define sleep settings
+  ltslp_en = the_mesh.getNodePrefs()->bridge_ltslp_enabled;    //boolean
+  sleeptime = the_mesh.getNodePrefs()->bridge_ltslp_slptime;   //seconds
+  awakeTime = the_mesh.getNodePrefs()->bridge_ltslp_awake;     //milliseconds
+
+  dpslp_en = the_mesh.getNodePrefs()->bridge_dpslp_enabled;    //boolean
+  startHr = the_mesh.getNodePrefs()->bridge_dpslp_starthr;     //UTC hrs
+  startMin = the_mesh.getNodePrefs()->bridge_dpslp_startmin;   //minutes
+  duration = the_mesh.getNodePrefs()->bridge_dpslp_duration;   //seconds
+  
 #ifdef DISPLAY_CLASS
   ui_task.begin(the_mesh.getNodePrefs(), FIRMWARE_BUILD_DATE, FIRMWARE_VERSION);
 #endif
@@ -170,6 +199,26 @@ void loop() {
   }
 #endif
 
+#ifdef WITH_ESPNOW_BRIDGE && defined(PIN_USER_BTN)
+int btnState = digitalRead(PIN_USER_BTN);
+  if (btnState == LOW) {
+    if (userBtnDownAt == 0) {
+      userBtnDownAt = millis();
+    } else if ((unsigned long)(millis() - userBtnDownAt) >= USER_BTN_HOLD_OFF_MILLIS) && (ltslp_en == 1 || dpslp_en == 1){
+      sleepDisabled = 1;            //Flag to turn off sleep modes. Reboot to re-enable sleep mode(s)
+      digitalWrite(35, HIGH);       //Flash the LED to show the sleep modes have been temporarily disabled
+	    delay(50);
+      digitalWrite(35, LOW);
+	    delay(50);
+      digitalWrite(35, HIGH);
+	    delay(50);
+      digitalWrite(35, LOW);
+      }
+  } else {
+    userBtnDownAt = 0;
+  }
+#endif
+
 #if defined(PIN_USER_BTN) && defined(_SEEED_SENSECAP_SOLAR_H_) && !defined(DISPLAY_CLASS)
   // Hold the user button to power off the SenseCAP Solar repeater.
   int btnState = digitalRead(PIN_USER_BTN);
@@ -183,7 +232,7 @@ void loop() {
   } else {
     userBtnDownAt = 0;
   }
-#endif
+#endif  
 
   the_mesh.loop();
   sensors.loop();
@@ -204,4 +253,19 @@ void loop() {
     }
 #endif
   }
+  #ifdef WITH_ESPNOW_BRIDGE   
+  // Establish a continuous light sleep/awake cycle, if enabled. 
+  if (ltslp_en == 1){     
+    unsigned long currentMillis = millis();
+    if ((currentMillis - previousMillis >= awakeTime) && sleepDisabled == 0) {
+      previousMillis = currentMillis;
+      board.sleep(sleeptime);         //Go into light sleep as defined in helpers/ESP32Board.h
+    }
+  }
+  // Establish a deep sleep starting within 10 secs of the node prefs UTC start hr/min, if enabled.
+  if (dpslp_en == 1){  
+    if ((rtc.getHour() == startHr) && (rtc.getMinute() == startMin) && (rtc.getSecond() < 10) && sleepDisabled == 0) {  
+    board.enterDeepSleep(duration);    //Go into deep sleep as defined in helpers/ESP32Board.cpp
+  }
+#endif
 }
