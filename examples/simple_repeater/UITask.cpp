@@ -113,7 +113,7 @@ void UITask::renderCurrScreen() {
       
   #ifdef WITH_ESPNOW_BRIDGE  
     _display->setCursor(0, 50);
-    sprintf(tmp, "ESPNOW BRG ON?:%d CH:%02d", _node_prefs->bridge_enabled, _node_prefs->bridge_channel);
+    sprintf(tmp, "ESPNOW BRG ON:%d CH:%d", _node_prefs->bridge_enabled, _node_prefs->bridge_channel);
     _display->print(tmp); 
   #endif    
   }
