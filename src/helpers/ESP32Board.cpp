@@ -11,8 +11,6 @@
 
 #include <SPIFFS.h>
 
-#include <helpers/bridges/ESPNowBridge.h>  // Added to support handling busy for deep sleep
-
 bool ESP32Board::startOTAUpdate(const char* id, char reply[]) {
   inhibit_sleep = true;   // prevent sleep during OTA
   WiFi.softAP("MeshCore-OTA", NULL);
@@ -52,16 +50,6 @@ void ESP32Board::powerOff() {
 }
 
 void ESP32Board::enterDeepSleep(uint32_t secs) {
-
-// Skip deep sleep start until ESPNow and LoRa traffic is processed [= 0]  
-if ((espnow_sending == 1) || (espnow_recving == 1) || lora_busy == 1) {  //check espnow status from espnowbridge.cpp and LoRa from ESP32board.h
-  delay(1);
-  espnow_recving = 0;  //Set to zero before checking the status again
-  espnow_sending = 0;  //Set to zero before checking the status again
-  lora_busy == 0;      //Set to zero before checking the status again
-  return;
-}        
-//-------------------------------------  
   // Power off the display if any
 #ifdef DISPLAY_CLASS
   display.turnOff();
