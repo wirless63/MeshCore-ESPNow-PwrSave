@@ -28,9 +28,10 @@ static char ethernet_command[160];
 #endif
 
 // For power saving
-unsigned long POWERSAVING_FIRSTSLEEP_SECS = 120; // The first sleep (if enabled) from boot
+//unsigned long POWERSAVING_FIRSTSLEEP_SECS = 120; // The first sleep (if enabled) from boot
 
 // Define Sleep variables and needed files
+#ifdef WITH_ESPNOW_BRIDGE
   unsigned long previousMillis = 0;   
   unsigned int sleepDisabled = 0;    
   uint8_t ltslp_en;
@@ -43,6 +44,7 @@ unsigned long POWERSAVING_FIRSTSLEEP_SECS = 120; // The first sleep (if enabled)
   #include <helpers/CommonCLI.h>  
   #include "Melopero_RV3028.h"
   Melopero_RV3028 rtc;
+#endif
 
 #if defined(PIN_USER_BTN) // && defined(_SEEED_SENSECAP_SOLAR_H_)
 static unsigned long userBtnDownAt = 0;
@@ -120,7 +122,8 @@ void setup() {
 
   the_mesh.begin(fs);
 
-  // Initialize RTC timing for deep sleep mode 6 Sep 2026
+#if WITH_ESPNOW_BRIDGE == 1
+	// Initialize RTC timing for deep sleep mode 6 Sep 2026
   Wire.begin();
   rtc.initI2C();
   rtc.set24HourMode();
@@ -134,7 +137,9 @@ void setup() {
   startHr = the_mesh.getNodePrefs()->bridge_dpslp_starthr;     //UTC hrs
   startMin = the_mesh.getNodePrefs()->bridge_dpslp_startmin;   //minutes
   duration = the_mesh.getNodePrefs()->bridge_dpslp_duration;   //seconds
-  
+  esp_sleep_enable_timer_wakeup(sleepTime * 1000000ULL);
+#endif
+	
 #ifdef DISPLAY_CLASS
   ui_task.begin(the_mesh.getNodePrefs(), FIRMWARE_BUILD_DATE, FIRMWARE_VERSION);
 #endif
@@ -199,7 +204,7 @@ void loop() {
   }
 #endif
 
-#ifdef WITH_ESPNOW_BRIDGE && defined(PIN_USER_BTN)
+#ifdef (WITH_ESPNOW_BRIDGE) && defined(PIN_USER_BTN)
 int btnState = digitalRead(PIN_USER_BTN);
   if (btnState == LOW) {
     if (userBtnDownAt == 0) {
@@ -243,29 +248,30 @@ int btnState = digitalRead(PIN_USER_BTN);
 
 #ifdef HAS_EXTERNAL_WATCHDOG
   external_watchdog.loop();
-#endif
-  if (the_mesh.getNodePrefs()->powersaving_enabled && !the_mesh.hasPendingWork()) {
-#if defined(NRF52_PLATFORM)
-    board.sleep(0); // nrf ignores seconds param, sleeps whenever possible
-#else
-    if (the_mesh.millisHasNowPassed(POWERSAVING_FIRSTSLEEP_SECS * 1000)) { // To check if it is time to sleep
-      board.sleep(30); // Sleep. Wake up after a while or when receiving a LoRa packet
-    }
-#endif
+//#endif
+//  if (the_mesh.getNodePrefs()->powersaving_enabled && !the_mesh.hasPendingWork()) {
+//#if defined(NRF52_PLATFORM)
+//    board.sleep(0); // nrf ignores seconds param, sleeps whenever possible
+//#else
+//    if (the_mesh.millisHasNowPassed(POWERSAVING_FIRSTSLEEP_SECS * 1000)) { // To check if it is time to sleep
+//      board.sleep(30); // Sleep. Wake up after a while or when receiving a LoRa packet
+//    }
+//#endif
   }
-  #ifdef WITH_ESPNOW_BRIDGE   
-  // Establish a continuous light sleep/awake cycle, if enabled. 
-  if (ltslp_en == 1){     
+if (WITH_ESPNOW_BRIDGE == 1 && sleepDisabled == 0){ 
+    if (ltslp_en == 1){
+    // Establish a continuous light sleep/awake cycle, if enabled. Hold if ESPNow or LoRa is busy
     unsigned long currentMillis = millis();
-    if ((currentMillis - previousMillis >= awakeTime) && sleepDisabled == 0) {
-      previousMillis = currentMillis;
-      board.sleep(sleeptime);         //Go into light sleep as defined in helpers/ESP32Board.h
+      if (currentMillis - previousMillis >= (awakeTime * 1000) && espnow_recving == 0 && espnow_sending == 0) { 
+        previousMillis = currentMillis;
+        board.sleep(sleepTime);   // Go to light sleep as defined in helpers/ESP32Board.h which addresses Lora busy hold
+      }
+    }
+  // Establish a deep sleep starting with the node prefs UTC start hr/min, if enabled.  Hold if ESPNow is busy
+    if (dpslp_en == 1 && espnow_recving == 0 && espnow_sending == 0){  
+      if ((rtc.getHour() == startHr) && (rtc.getMinute() == startMin)) {
+        board.enterDeepSleep(duration);    //Go into deep sleep as defined in helpers/ESP32Board.cpp
+      }
     }
   }
-  // Establish a deep sleep starting within 10 secs of the node prefs UTC start hr/min, if enabled.
-  if (dpslp_en == 1){  
-    if ((rtc.getHour() == startHr) && (rtc.getMinute() == startMin) && (rtc.getSecond() < 10) && sleepDisabled == 0) {  
-    board.enterDeepSleep(duration);    //Go into deep sleep as defined in helpers/ESP32Board.cpp
-  }
-#endif
 }
