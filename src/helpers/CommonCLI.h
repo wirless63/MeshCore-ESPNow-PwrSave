@@ -56,12 +56,12 @@ public:
   char bridge_secret[16]; // for XOR encryption of bridge packets (ESP-NOW only)
   uint8_t bridge_wifi_txpwr = 80;   // 8-80 which equates to 2-20 dbm (ESP-NOW only)
   uint8_t bridge_ltslp_enabled = 0; // 1=on, 0=off, boolean (ESP-NOW only)
-  uint16_t bridge_ltslp_slptime = 1; // seconds (ESP-NOW only)
-  uint16_t bridge_ltslp_awake = 2000;   // milliseconds (ESP-NOW only)
+  uint32_t bridge_ltslp_slptime = 1; // seconds (ESP-NOW only)
+  uint32_t bridge_ltslp_awake = 2;   // seconds (ESP-NOW only)
   uint8_t bridge_dpslp_enabled = 0;  // 1=on, 0=off, boolean (ESP-NOW only)
-  uint8_t bridge_dpslp_starthr = 8; //UTC hour 0-23  (ESP-NOW only)
-  uint8_t bridge_dpslp_startmin = 0; //0-59  (ESP-NOW only)  
-  uint32_t bridge_dpslp_duration = 10; //seconds (ESP-NOW only)
+  uint8_t bridge_dpslp_starthr = 8; // UTC hour 0-23  (ESP-NOW only)
+  uint8_t bridge_dpslp_startmin = 0; // 0-59  (ESP-NOW only)  
+  uint32_t bridge_dpslp_duration = 61; //seconds (ESP-NOW only)
   // Power setting
   uint8_t powersaving_enabled = 0; // boolean
   // Gps settings
