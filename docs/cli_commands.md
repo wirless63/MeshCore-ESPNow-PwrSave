@@ -1168,12 +1168,14 @@ region save
 #### View or change the ESP-Now Light Sleep Sleeping Time (ESPNow only)
 **Usage:** 
 - `get bridge.ltslp.slptime`
-- `set bridge.ltslp.slptime <ltslp>`
+- `set bridge.ltslp.slptime <slptime>`
 
 **Parameters:**
-- `ltslp`: Light Sleep time sleeping in seconds (0-64800)
+- `slptime`: Light Sleep time sleeping in seconds (0-86399)
 
 **Default:** `1`
+
+**Notes:** If you also have Deep Sleep enabled then **the slptime must not exceed 59 seconds or deep sleep will not start**. Deep Sleep is triggered by a UTC HOUR and MINUTE setting and exceeding 59 seconds will increment the clock by one minute preventing the deep sleep. 
 
 ---
 
@@ -1183,7 +1185,7 @@ region save
 - `set bridge.ltslp.awake <awake>`
 
 **Parameters:**
-- `awake`: Light Sleep time awake in milliseconds (0-64800)
+- `awake`: Light Sleep time awake in milliseconds (0-86399)
 
 **Default:** `2000`
 
@@ -1214,17 +1216,21 @@ Deep Sleep can be temporarily disabled (USB, Web Flashing, etc.), only while not
 
 **Default:** `8`
 
+**Notes:** If you also have Light Sleep enabled then make sure the light sleep **sleep time does not exceed 59 seconds or deep sleep will not begin**. Deep Sleep is triggered by a UTC HOUR and MINUTE setting and exceeding 59 seconds in a light sleep will increment the clock by one minute preventing the deep sleep. 
+
 ---
 
 #### View or change the ESP-Now Off-Hours Deep Sleep Start Minute (ESPNow only)
 **Usage:** 
 - `get bridge.dpslp.startmin`
-- `set bridge.dpslp.startmin <starthr>`
+- `set bridge.dpslp.startmin <startmin>`
 
 **Parameters:** 
-- `startmin`: The start minute of start hour for deep sleep (0-59)
+- `startmin`: The start minute of the hour for deep sleep (0-59)
 
 **Default:** `0`
+
+**Notes:** If you also have Light Sleep enabled then make sure the light sleep **sleep time does not exceed 59 seconds or deep sleep will not begin**. Deep Sleep is triggered by a UTC HOUR and MINUTE setting and exceeding 59 seconds in a light sleep will increment the clock by one minute preventing the deep sleep. 
 
 ---
 
@@ -1234,9 +1240,11 @@ Deep Sleep can be temporarily disabled (USB, Web Flashing, etc.), only while not
 - `set bridge.dpslp.duration <duration>`
 
 **Parameters:**
-- `duration`: Off-hours deep sleep duration in seconds (10-86390)
+- `duration`: Off-hours deep sleep duration in seconds (61-86339)
 
-**Default:** `10`
+**Default:** `61`
+
+**Notes:** The minimun duration is 61 seconds to prevent multiple deep sleep cycles. Deep Sleep is triggered by a UTC HOUR and MINUTE setting and less than 60 second duration will trigger multiple deep sleeps.
 
 ---
 
