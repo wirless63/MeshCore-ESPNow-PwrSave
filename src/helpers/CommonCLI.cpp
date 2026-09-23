@@ -102,15 +102,15 @@ void CommonCLI::loadPrefsInt(FILESYSTEM* fs, const char* filename) {  // Legacy 
     file.read((uint8_t *)&_prefs->flood_max_advert, sizeof(_prefs->flood_max_advert));             // 292
     file.read((uint8_t *)&_prefs->radio_fem_rxgain, sizeof(_prefs->radio_fem_rxgain));             // 293
     file.read((uint8_t *)&_prefs->cad_enabled, sizeof(_prefs->cad_enabled));                       // 294
-	  file.read((uint8_t *)&_prefs->bridge_wifi_txpwr, sizeof(_prefs->bridge_wifi_txpwr));		       // 295
-	  file.read((uint8_t *)&_prefs->bridge_ltslp_enabled, sizeof(_prefs->bridge_ltslp_enabled));     // 296
-	  file.read((uint8_t *)&_prefs->bridge_ltslp_slptime, sizeof(_prefs->bridge_ltslp_slptime));     // 297
-	  file.read((uint8_t *)&_prefs->bridge_ltslp_awake, sizeof(_prefs->bridge_ltslp_awake));         // 299
-	  file.read((uint8_t *)&_prefs->bridge_dpslp_enabled, sizeof(_prefs->bridge_dpslp_enabled));     // 301
-	  file.read((uint8_t *)&_prefs->bridge_dpslp_starthr, sizeof(_prefs->bridge_dpslp_starthr));     // 302
-	  file.read((uint8_t *)&_prefs->bridge_dpslp_startmin, sizeof(_prefs->bridge_dpslp_startmin));   // 304  
-	  file.read((uint8_t *)&_prefs->bridge_dpslp_duration, sizeof(_prefs->bridge_dpslp_duration));   // 306
-	  // next: 309
+	file.read((uint8_t *)&_prefs->bridge_wifi_txpwr, sizeof(_prefs->bridge_wifi_txpwr));		       // 295
+	file.read((uint8_t *)&_prefs->bridge_ltslp_enabled, sizeof(_prefs->bridge_ltslp_enabled));     // 296
+	file.read((uint8_t *)&_prefs->bridge_ltslp_slptime, sizeof(_prefs->bridge_ltslp_slptime));     // 297
+	file.read((uint8_t *)&_prefs->bridge_ltslp_awake, sizeof(_prefs->bridge_ltslp_awake));         // 301
+	file.read((uint8_t *)&_prefs->bridge_dpslp_enabled, sizeof(_prefs->bridge_dpslp_enabled));     // 305
+	file.read((uint8_t *)&_prefs->bridge_dpslp_starthr, sizeof(_prefs->bridge_dpslp_starthr));     // 306
+	file.read((uint8_t *)&_prefs->bridge_dpslp_startmin, sizeof(_prefs->bridge_dpslp_startmin));   // 307  
+	file.read((uint8_t *)&_prefs->bridge_dpslp_duration, sizeof(_prefs->bridge_dpslp_duration));   // 308
+	// next: 312
 
     // sanitise bad pref values
     _prefs->rx_delay_base = constrain(_prefs->rx_delay_base, 0, 20.0f);
@@ -132,14 +132,14 @@ void CommonCLI::loadPrefsInt(FILESYSTEM* fs, const char* filename) {  // Legacy 
     _prefs->bridge_pkt_src = constrain(_prefs->bridge_pkt_src, 0, 1);
     _prefs->bridge_baud = constrain(_prefs->bridge_baud, 9600, BRIDGE_MAX_BAUD);
     _prefs->bridge_channel = constrain(_prefs->bridge_channel, 0, 14);
-	  _prefs->bridge_wifi_txpwr = constrain(_prefs->bridge_wifi_txpwr, 8, 80);
-	  _prefs->bridge_ltslp_enabled = constrain(_prefs->bridge_ltslp_enabled, 0, 1);
-	  _prefs->bridge_ltslp_slptime = constrain(_prefs->bridge_ltslp_slptime, 1, 64800);
-	  _prefs->bridge_ltslp_awake = constrain(_prefs->bridge_ltslp_awake, 1, 64800);
-	  _prefs->bridge_dpslp_enabled = constrain(_prefs->bridge_dpslp_enabled, 0, 1);
-	  _prefs->bridge_dpslp_starthr = constrain(_prefs->bridge_dpslp_starthr, 0, 23);
-	  _prefs->bridge_dpslp_startmin = constrain(_prefs->bridge_dpslp_startmin, 0, 59);
-	  _prefs->bridge_dpslp_duration = constrain(_prefs->bridge_dpslp_duration, 10, 86390);
+	_prefs->bridge_wifi_txpwr = constrain(_prefs->bridge_wifi_txpwr, 8, 80);
+	_prefs->bridge_ltslp_enabled = constrain(_prefs->bridge_ltslp_enabled, 0, 1);
+	_prefs->bridge_ltslp_slptime = constrain(_prefs->bridge_ltslp_slptime, 1, 86399);
+	_prefs->bridge_ltslp_awake = constrain(_prefs->bridge_ltslp_awake, 1, 86399);
+	_prefs->bridge_dpslp_enabled = constrain(_prefs->bridge_dpslp_enabled, 0, 1);
+	_prefs->bridge_dpslp_starthr = constrain(_prefs->bridge_dpslp_starthr, 0, 23);
+	_prefs->bridge_dpslp_startmin = constrain(_prefs->bridge_dpslp_startmin, 0, 59);
+	_prefs->bridge_dpslp_duration = constrain(_prefs->bridge_dpslp_duration, 61, 86339);
     
     _prefs->powersaving_enabled = constrain(_prefs->powersaving_enabled, 0, 1);
 
@@ -801,21 +801,21 @@ void CommonCLI::handleSetCmd(uint32_t sender_timestamp, char* command, char* rep
 	    }
   } else if (memcmp(config, "bridge.ltslp.slptime ", 21) == 0) {
     int slptime = atoi(&config[21]);
-        if (slptime > 0 && slptime < 64801) {
-        _prefs->bridge_ltslp_slptime = (uint16_t)slptime;
+        if (slptime > 0 && slptime < 86400) {
+        _prefs->bridge_ltslp_slptime = (uint32_t)slptime;
         savePrefs();
         strcpy(reply, "OK - Light Sleeping time is set. Enable Light Sleep Mode and Reboot");
 	    }else {
-        strcpy(reply, "Error: Sleeping time must be between 1-64800 seconds");	
+        strcpy(reply, "Error: Sleeping time must be between 1-86399 seconds");	
 		}
   } else if (memcmp(config, "bridge.ltslp.awake ", 19) == 0) {
     int awake = atoi(&config[19]);
-        if (awake > 0 && awake < 64801) {
-        _prefs->bridge_ltslp_awake = (uint16_t)awake;
+        if (awake > 0 && awake < 86400) {
+        _prefs->bridge_ltslp_awake = (uint32_t)awake;
         savePrefs();
         strcpy(reply, "OK - Light Sleep awake time is set. Enable Light Sleep Mode and Reboot");
 	    }else {
-        strcpy(reply, "Error: Awake time must be between 1-64800 milliseconds");	
+        strcpy(reply, "Error: Awake time must be between 1-86399 seconds");	
 		  }
 
   } else if (memcmp(config, "bridge.dpslp.enabled ", 21) == 0) {
@@ -832,7 +832,7 @@ void CommonCLI::handleSetCmd(uint32_t sender_timestamp, char* command, char* rep
 	    }
   } else if (memcmp(config, "bridge.dpslp.starthr ", 21) == 0) {
     int starthr = atoi(&config[21]);
-        if (starthr != NULL && starthr > -1 && starthr < 24) {
+        if (starthr > -1 && starthr < 24) {
         _prefs->bridge_dpslp_starthr = (uint8_t)starthr;
         savePrefs();
         strcpy(reply, "OK - Deep Sleep UTC start hour is set. Enable Deep Sleep Mode and Reboot");
@@ -841,7 +841,7 @@ void CommonCLI::handleSetCmd(uint32_t sender_timestamp, char* command, char* rep
 		}	
   } else if (memcmp(config, "bridge.dpslp.startmin ", 22) == 0) {
     int startmin = atoi(&config[22]);
-        if (startmin != NULL && startmin > -1 && startmin < 60) {
+        if (startmin > -1 && startmin < 60) {
         _prefs->bridge_dpslp_startmin = (uint8_t)startmin;
         savePrefs();
         strcpy(reply, "OK - Deep Sleep start minutes is set. Enable Deep Sleep Mode and Reboot");
@@ -850,12 +850,12 @@ void CommonCLI::handleSetCmd(uint32_t sender_timestamp, char* command, char* rep
 		}	    
   } else if (memcmp(config, "bridge.dpslp.duration ", 22) == 0) {
     int duration = atoi(&config[22]);
-      if (duration > 9 && duration < 86391) {
+      if (duration > 60 && duration < 86340) {
         _prefs->bridge_dpslp_duration = (uint32_t)duration;
         savePrefs();
         strcpy(reply, "OK - Deep Sleep duration is set. Enable Deep Sleep Mode and Reboot");
 	    }else {
-        strcpy(reply, "Error: Deep Sleep duration must be between 10-86390 seconds");	
+        strcpy(reply, "Error: Deep Sleep duration must be between 61-86339 seconds");	
 		}  
 #endif
   } else if (memcmp(config, "adc.multiplier ", 15) == 0) {
@@ -1031,9 +1031,9 @@ void CommonCLI::handleGetCmd(uint32_t sender_timestamp, char* command, char* rep
   } else if (memcmp(config, "bridge.ltslp.enabled", 21) == 0) {
     sprintf(reply, "> %s", _prefs->bridge_ltslp_enabled ? "on" : "off");
   } else if (memcmp(config, "bridge.ltslp.slptime", 21) == 0) {
-    sprintf(reply, "> %d", (uint16_t)_prefs->bridge_ltslp_slptime);	  
+    sprintf(reply, "> %d", (uint32_t)_prefs->bridge_ltslp_slptime);	  
   } else if (memcmp(config, "bridge.ltslp.awake", 19) == 0) {
-    sprintf(reply, "> %d", (uint16_t)_prefs->bridge_ltslp_awake);
+    sprintf(reply, "> %d", (uint32_t)_prefs->bridge_ltslp_awake);
   } else if (memcmp(config, "bridge.dpslp.enabled", 21) == 0) {
     sprintf(reply, "> %s", _prefs->bridge_dpslp_enabled ? "on" : "off"); 
   } else if (memcmp(config, "bridge.dpslp.starthr", 21) == 0) {
