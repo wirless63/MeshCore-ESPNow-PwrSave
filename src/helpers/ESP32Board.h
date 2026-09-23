@@ -15,9 +15,6 @@
 #include "soc/rtc.h"
 #include "esp_system.h"
 #include <driver/rtc_io.h>
-#include <helpers/bridges/ESPNowBridge.h>
-
-inline int lora_busy;
 
 class ESP32Board : public mesh::MainBoard {
 protected:
@@ -79,15 +76,6 @@ public:
       delay(1); // Give MCU to OTA to run
       return;
     }
-  #ifdef WITH_ESPNOW_BRIDGE
-    // Added to skip sleep until ESPNow traffic is processed [= 0]
-    if ((espnow_sending == 1) || espnow_recving == 1) { //check espnow status before sleep. From espnowbridge.cpp
-      delay(1);
-      espnow_recving = 0;  //Set to zero before checking status again
-      espnow_sending = 0;  //Set to zero before checking status again
-    return;
-    }  
-  #endif  
     // Set GPIO wakeup
     gpio_num_t wakeupPin = (gpio_num_t)getIRQGpio();    
 
@@ -101,7 +89,6 @@ public:
 
     // Skip sleep if there is a LoRa packet
     if (gpio_get_level(wakeupPin) == HIGH) {
-      lora_busy = 1;
       portEXIT_CRITICAL(&sleepMux);
       delay(1);
       return;
