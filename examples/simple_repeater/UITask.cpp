@@ -129,7 +129,7 @@ void UITask::loop() {
       _display->turnOn();
     }
     _auto_off = millis() + AUTO_OFF_MILLIS;   // extend auto-off timer
-  #ifdef !WITH_ESPNOW_BRIDGE
+  #if !defined(WITH_ESPNOW_BRIDGE)
   } else if (ev == BUTTON_EVENT_LONG_PRESS) {
       _display->turnOn();
       Serial.println("Powering Off");
