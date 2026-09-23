@@ -163,6 +163,7 @@ void ESPNowBridge::onDataRecv(const uint8_t *mac, const uint8_t *data, int32_t l
 
 void ESPNowBridge::onDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
   // Could add transmission error handling here if needed
+     espnow_sending = 0;   
 }
 
 void ESPNowBridge::sendPacket(mesh::Packet *packet) {
@@ -224,6 +225,7 @@ void ESPNowBridge::sendPacket(mesh::Packet *packet) {
   }
 }
 void ESPNowBridge::onPacketReceived(mesh::Packet *packet) {
+  espnow_recving = 0;                                            //ESPNow recv not busy   
   handleReceivedPacket(packet);
 }
 
