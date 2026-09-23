@@ -1185,9 +1185,9 @@ region save
 - `set bridge.ltslp.awake <awake>`
 
 **Parameters:**
-- `awake`: Light Sleep time awake in milliseconds (0-86399)
+- `awake`: Light Sleep time awake in seconds (0-86399)
 
-**Default:** `2000`
+**Default:** `2`
 
 ---
 
