@@ -36,11 +36,11 @@ static char ethernet_command[160];
   unsigned int sleepDisabled = 0;    
   uint8_t ltslp_en;
   uint8_t dpslp_en;  
-  uint16_t sleeptime;
-  uint16_t awakeTime;
+  uint32_t sleepTime;
+  uint32_t awakeTime;
   uint8_t startHr;
   uint8_t startMin;  
-  uint16_t duration;
+  uint32_t duration;
   #include <helpers/CommonCLI.h>  
   #include "Melopero_RV3028.h"
   Melopero_RV3028 rtc;
@@ -130,7 +130,7 @@ void setup() {
 
 // Get prefs from memory to enable/disable sleep modes and define sleep settings
   ltslp_en = the_mesh.getNodePrefs()->bridge_ltslp_enabled;    //boolean
-  sleeptime = the_mesh.getNodePrefs()->bridge_ltslp_slptime;   //seconds
+  sleepTime = the_mesh.getNodePrefs()->bridge_ltslp_slptime;   //seconds
   awakeTime = the_mesh.getNodePrefs()->bridge_ltslp_awake;     //milliseconds
 
   dpslp_en = the_mesh.getNodePrefs()->bridge_dpslp_enabled;    //boolean
