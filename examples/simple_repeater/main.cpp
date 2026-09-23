@@ -204,7 +204,7 @@ void loop() {
   }
 #endif
 
-#ifdef (WITH_ESPNOW_BRIDGE) && defined(PIN_USER_BTN)
+#ifdef WITH_ESPNOW_BRIDGE && defined(PIN_USER_BTN)
 int btnState = digitalRead(PIN_USER_BTN);
   if (btnState == LOW) {
     if (userBtnDownAt == 0) {
