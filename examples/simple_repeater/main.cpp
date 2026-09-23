@@ -209,7 +209,7 @@ int btnState = digitalRead(PIN_USER_BTN);
   if (btnState == LOW) {
     if (userBtnDownAt == 0) {
       userBtnDownAt = millis();
-    } else if ((unsigned long)(millis() - userBtnDownAt) >= USER_BTN_HOLD_OFF_MILLIS) && (ltslp_en == 1 || dpslp_en == 1){
+    } else if (((unsigned long)(millis() - userBtnDownAt) >= USER_BTN_HOLD_OFF_MILLIS) && (ltslp_en == 1 || dpslp_en == 1)){
       sleepDisabled = 1;            //Flag to turn off sleep modes. Reboot to re-enable sleep mode(s)
       digitalWrite(35, HIGH);       //Flash the LED to show the sleep modes have been temporarily disabled
 	    delay(50);
