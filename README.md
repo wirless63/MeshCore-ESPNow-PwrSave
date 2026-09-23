@@ -1,6 +1,6 @@
 ## About MeshCore Repeater w/ESPNow Bridge-Power Save
 
-Power Save is specifically designed for solar powered repeaters using ESPNow Bridging and the Heltec V4 node. By default, the base firmware power save mode is diabled for the ESP32 with ESPNow Bridge. This firmware creates a Light Sleep and Deep Sleep to address the power hungry (120ma idle/rx) EPS32S3 repeaters using ESPNow.
+Power Save is specifically designed for solar powered repeaters using ESPNow Bridging and the Heltec V4 node. By default, the base firmware power save mode is disabled for the ESP32 with ESPNow Bridge. This firmware creates a Light Sleep and Deep Sleep to address the power hungry (120ma idle/rx) EPS32S3 repeaters using ESPNow.
 
 Light Sleep (no reboot upon awaking and 1-3 ms recovery) can be enabled or disabled from CLI in this firmware. This light sleep is a continuous cycle of awake and sleep time based on CLI settings defined by the administrator. The default is 2 secs awake and 1 sec sleep. The idle/rx current draw is reduced to 30ma in a light sleep mode.
 The firmware will not go into light sleep and pauses until any pending ESPNow and LoRa traffic has been processed. The light sleep cycle should have little/no impact to direct messaging due to multiple retries. Automatically wakes up on Lora by default. However, there is no wake up of ESPNow so adverts and flood messages may be missed during sleep. Use caution when enabling both Light and Deep Sleep as Light Sleep time can impact the ability for Deep Sleep to start.
