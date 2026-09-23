@@ -246,8 +246,8 @@ int btnState = digitalRead(PIN_USER_BTN);
 #endif
   rtc_clock.tick();
 
-#ifdef HAS_EXTERNAL_WATCHDOG
-  external_watchdog.loop();
+//#ifdef HAS_EXTERNAL_WATCHDOG
+//  external_watchdog.loop();
 //#endif
 //  if (the_mesh.getNodePrefs()->powersaving_enabled && !the_mesh.hasPendingWork()) {
 //#if defined(NRF52_PLATFORM)
@@ -257,7 +257,7 @@ int btnState = digitalRead(PIN_USER_BTN);
 //      board.sleep(30); // Sleep. Wake up after a while or when receiving a LoRa packet
 //    }
 //#endif
-  }
+//  }
 if (WITH_ESPNOW_BRIDGE == 1 && sleepDisabled == 0){ 
     if (ltslp_en == 1){
     // Establish a continuous light sleep/awake cycle, if enabled. Hold if ESPNow or LoRa is busy
