@@ -131,7 +131,7 @@ void setup() {
 // Get prefs from memory to enable/disable sleep modes and define sleep settings
   ltslp_en = the_mesh.getNodePrefs()->bridge_ltslp_enabled;    //boolean
   sleepTime = the_mesh.getNodePrefs()->bridge_ltslp_slptime;   //seconds
-  awakeTime = the_mesh.getNodePrefs()->bridge_ltslp_awake;     //milliseconds
+  awakeTime = the_mesh.getNodePrefs()->bridge_ltslp_awake;     //seconds
 
   dpslp_en = the_mesh.getNodePrefs()->bridge_dpslp_enabled;    //boolean
   startHr = the_mesh.getNodePrefs()->bridge_dpslp_starthr;     //UTC hrs
